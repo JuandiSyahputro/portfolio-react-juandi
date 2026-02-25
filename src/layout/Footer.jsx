@@ -1,9 +1,11 @@
-import { Github, Linkedin, Twitter, Heart } from "lucide-react";
+import IconGithub from "@/components/custom-icons/IconGithub";
+import IconInstagram from "@/components/custom-icons/IconInstagram";
+import IconLinkedin from "@/components/custom-icons/IconLinkedin";
 
 const socialLinks = [
-  { icon: Github, href: "#", label: "GitHub" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: IconGithub, href: "https://github.com/JuandiSyahputro", label: "GitHub" },
+  { icon: IconLinkedin, href: "https://www.linkedin.com/in/juandi-syahputro-08676b240/", label: "Linkedin" },
+  { icon: IconInstagram, href: "https://www.instagram.com/msyhptr15/", label: "Instagram" },
 ];
 
 const footerLinks = [
@@ -13,7 +15,7 @@ const footerLinks = [
   { href: "#contact", label: "Contact" },
 ];
 
-export const Footer = () => {
+export const Footer = ({ onClickScroll }) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -23,35 +25,24 @@ export const Footer = () => {
           {/* Logo & Copyright */}
           <div className="text-center md:text-left">
             <a href="#" className="text-xl font-bold tracking-tight">
-              PM<span className="text-primary">.</span>
+              JS<span className="text-primary">.</span>
             </a>
-            <p className="text-sm text-muted-foreground mt-2">
-              © {currentYear} Pedro Machado. All rights reserved.
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">© {currentYear} Juandi Syahputro. All rights reserved.</p>
           </div>
 
           {/* Links */}
           <nav className="flex flex-wrap justify-center gap-6">
             {footerLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button key={link.label} onClick={() => onClickScroll(link.href)} aria-label={link.label} className="p-2 rounded-full glass hover:bg-primary/10 hover:text-primary transition-all" target="_blank">
                 {link.label}
-              </a>
+              </button>
             ))}
           </nav>
 
           {/* Social Links */}
           <div className="flex items-center gap-4">
             {socialLinks.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                aria-label={social.label}
-                className="p-2 rounded-full glass hover:bg-primary/10 hover:text-primary transition-all"
-              >
+              <a key={social.label} href={social.href} aria-label={social.label} className="p-2 rounded-full glass hover:bg-primary/10 hover:text-primary transition-all" target="_blank">
                 <social.icon className="w-5 h-5" />
               </a>
             ))}
