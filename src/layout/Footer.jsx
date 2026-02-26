@@ -1,6 +1,6 @@
-import IconGithub from "@/components/custom-icons/IconGithub";
-import IconInstagram from "@/components/custom-icons/IconInstagram";
-import IconLinkedin from "@/components/custom-icons/IconLinkedin";
+import { IconGithub } from "@/components/custom-icons/IconGithub";
+import { IconInstagram } from "@/components/custom-icons/IconInstagram";
+import { IconLinkedin } from "@/components/custom-icons/IconLinkedin";
 
 const socialLinks = [
   { icon: IconGithub, href: "https://github.com/JuandiSyahputro", label: "GitHub" },

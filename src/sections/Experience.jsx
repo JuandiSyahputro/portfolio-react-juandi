@@ -1,51 +1,9 @@
 import gsap from "gsap";
 
+import { experiences } from "@/utils/data-dummy";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
-
-const experiences = [
-  {
-    period: "2024 — Present",
-    role: "Full Stack Developer",
-    company: "PT. Yamisok Platform Indonesia",
-    description: "Build and maintain web application using React, Next.js, and Express.js. Collaborate with cross-functional teams to deliver high-quality software.",
-    technologies: ["React", "TypeScript", "Next.js", "Express.js", "MySQL", "Tailwind CSS"],
-    current: true,
-  },
-  {
-    period: "2023 — 2024",
-    role: "Frontend Engineer",
-    company: "Koneksi Group",
-    description: "Built and maintained multiple React applications for enterprise clients. Implemented responsive design and ensured pixel-perfect UI/UX.",
-    technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-    current: false,
-  },
-  {
-    period: "2022 — 2023",
-    role: "Web Developer Intern",
-    company: "Koneksi Group",
-    description: "Contributed to the development to stagging. Collaborated with designers to implement pixel-perfect UI components.",
-    technologies: ["React", "HTML", "Tailwind CSS"],
-    current: false,
-  },
-  {
-    period: "2022 — 2022",
-    role: "Web Developer Intern",
-    company: "PT. Ousean Global Digital",
-    description: "Contributed to the development of a education platform from MVP to stagging. Collaborated with designers to implement pixel-perfect UI components.",
-    technologies: ["React", "Next.js", "Tailwind CSS"],
-    current: false,
-  },
-  {
-    period: "2022 — 2022",
-    role: "Web Developer Intern",
-    company: "King Kocok",
-    description: "Build and maintain web application of a inventory management system using Laravel, Mysql, and Bootstrap. Handle the backend and frontend development.",
-    technologies: ["Laravel", "PHP", "MySQL", "Bootstrap"],
-    current: false,
-  },
-];
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 

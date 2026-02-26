@@ -10,4 +10,4 @@ const IconInstagram = (props) => {
   );
 };
 
-export default IconInstagram;
+export { IconInstagram };

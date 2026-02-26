@@ -2,11 +2,33 @@
 import { Button } from "@/components/Button";
 import { ArrowRight, ChevronDown, Download } from "lucide-react";
 import { AnimatedBorderButton } from "@/components/AnimatedBorderButton";
-import IconGithub from "@/components/custom-icons/IconGithub";
-import IconInstagram from "@/components/custom-icons/IconInstagram";
-import IconLinkedin from "@/components/custom-icons/IconLinkedin";
+import { IconGithub } from "@/components/custom-icons/IconGithub";
+import { IconInstagram } from "@/components/custom-icons/IconInstagram";
+import { IconLinkedin } from "@/components/custom-icons/IconLinkedin";
 
-const skills = ["React", "Next.js", "TypeScript", "Node.js", "PHP", "Laravel", "CodeIgniter", "MySQL", "PostgreSQL", "MongoDB", "Redis", "Docker", "AWS", "Vercel", "Tailwind CSS", "Prisma", "Jest", "Figma", "Git", "GitHub Actions"];
+const skills = [
+  "React",
+  "Next.js",
+  "TypeScript",
+  "Node.js",
+  "PHP",
+  "Laravel",
+  "CodeIgniter",
+  "MySQL",
+  "PostgreSQL",
+  "MongoDB",
+  "Redis",
+  "Docker",
+  "AWS",
+  "Vercel",
+  "Tailwind CSS",
+  "Prisma",
+  "Jest",
+  "Figma",
+  "Git",
+  "GitHub Actions",
+  "Redux",
+];
 
 export const Hero = ({ onClickScroll, ...props }) => {
   return (

@@ -10,4 +10,4 @@ const IconGithub = (props) => {
   );
 };
 
-export default IconGithub;
+export { IconGithub };

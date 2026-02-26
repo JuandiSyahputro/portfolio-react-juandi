@@ -1,42 +1,13 @@
+import { useDialog } from "@/hooks/UseContextHooks";
+
 import { AnimatedBorderButton } from "@/components/AnimatedBorderButton";
-import IconGithub from "@/components/custom-icons/IconGithub";
+import { IconGithub } from "@/components/custom-icons/IconGithub";
+import { projects } from "@/utils/data-dummy";
 import { ArrowUpRight } from "lucide-react";
-const projects = [
-  {
-    title: "Inventory Management System",
-    description: "A robust inventory management system with advanced features for tracking and optimizing inventory levels.",
-    image: "/projects/inventory.webp",
-    tags: ["React", "Next.js", "Typescript", "NodeJS"],
-    link: "https://inventory-dina-purcashing.vercel.app/",
-    github: "https://github.com/JuandiSyahputro/inventory-dina-purcashing",
-  },
-  {
-    title: "RESTful API",
-    description: "An API that allows users to create, read, update, and delete data.",
-    image: "/projects/res-api.webp",
-    tags: ["Nest.js", "MySQL", "Swagger", "TypeScript"],
-    link: "#",
-    github: "https://github.com/JuandiSyahputro/fa514aea-9ed9-4943-8cd4-3b0466367bb3",
-  },
-  {
-    title: "AI Writing Assistant",
-    description: "An intelligent writing tool powered by GPT-4, helping users create better content faster.",
-    image: "/projects/project3.png",
-    tags: ["React", "OpenAI", "Python", "FastAPI"],
-    link: "#",
-    github: "#",
-  },
-  {
-    title: "Project Management Tool",
-    description: "A collaborative workspace for teams with real-time updates, task tracking, and integrations.",
-    image: "/projects/project4.png",
-    tags: ["Next.js", "Socket.io", "MongoDB", "Redis"],
-    link: "#",
-    github: "#",
-  },
-];
 
 export const Projects = (props) => {
+  const { handleOpenDialog, handleClickPopup } = useDialog();
+
   return (
     <section id="projects" className="py-32 relative overflow-hidden" {...props}>
       {/* Bg glows */}
@@ -55,7 +26,7 @@ export const Projects = (props) => {
 
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project, idx) => (
+          {projects.slice(0, 2).map((project, idx) => (
             <div key={idx} className="group glass rounded-2xl overflow-hidden animate-fade-in md:row-span-1" style={{ animationDelay: `${(idx + 1) * 100}ms` }}>
               {/* Image */}
               <div className="relative overflow-hidden aspect-video">
@@ -63,13 +34,13 @@ export const Projects = (props) => {
                 <div className="absolute inset-0 bg-linear-to-t from-card via-card/50 to-transparent opacity-60" />
                 {/* Overlay Links */}
                 <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <a href={project.link} className="p-3 rounded-full glass hover:bg-primary hover:text-primary-foreground transition-all" {...(project.link !== "#" ? { target: "_blank" } : {})}>
+                  <button onClick={() => handleClickPopup(project.link)} className="p-3 rounded-full glass hover:bg-primary hover:text-primary-foreground transition-all">
                     <ArrowUpRight className="w-5 h-5" />
-                  </a>
-                  <a href={project.github} className="p-3 rounded-full glass hover:bg-primary hover:text-primary-foreground transition-all" {...(project.github !== "#" ? { target: "_blank" } : {})}>
+                  </button>
+                  <button onClick={() => handleClickPopup(project.github)} className="p-3 rounded-full glass hover:bg-primary hover:text-primary-foreground transition-all">
                     {/* <Github className="w-5 h-5" /> */}
                     <IconGithub className="w-5 h-5" />
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -94,10 +65,11 @@ export const Projects = (props) => {
 
         {/* View All CTA */}
         <div className="text-center mt-12 animate-fade-in animation-delay-500">
-          <AnimatedBorderButton>
+          <AnimatedBorderButton className="cursor-pointer" type="button" onClick={handleOpenDialog}>
             View All Projects
             <ArrowUpRight className="w-5 h-5" />
           </AnimatedBorderButton>
+          {/* <DialogDemo /> */}
         </div>
       </div>
     </section>

@@ -10,4 +10,4 @@ const IconLinkedin = (props) => {
   );
 };
 
-export default IconLinkedin;
+export { IconLinkedin };
