@@ -31,6 +31,17 @@ const skills = [
 ];
 
 export const Hero = ({ onClickScroll, ...props }) => {
+  const handleDownloadResume = () => {
+    const promise = new Promise((resolve) => setTimeout(resolve, 1000));
+
+    promise.then(() => {
+      const link = document.createElement("a");
+      link.href = "/CV-JUANDI.pdf";
+      link.download = "CV-JUANDI.pdf";
+      link.click();
+    });
+  };
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden" id="hero" {...props}>
       {/* Bg */}
@@ -88,7 +99,7 @@ export const Hero = ({ onClickScroll, ...props }) => {
               <Button size="lg" onClick={() => onClickScroll("#contact")}>
                 Contact Me <ArrowRight className="w-5 h-5" />
               </Button>
-              <AnimatedBorderButton>
+              <AnimatedBorderButton onClick={handleDownloadResume}>
                 <Download className="w-5 h-5" />
                 Download CV
               </AnimatedBorderButton>
