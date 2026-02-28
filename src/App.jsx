@@ -3,9 +3,10 @@ import { useRef } from "react";
 
 import { useDialog } from "@/hooks/UseContextHooks";
 import { useGSAP } from "@gsap/react";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import { DialogCarousel } from "@/components/DialogCarousel";
 import { Footer } from "@/layout/Footer";
@@ -62,6 +63,7 @@ function App() {
         <p>This project is not active at the moment. Please check back later for updates.</p>
       </DialogPopup>
       <SpeedInsights />
+      <Analytics />
     </div>
   );
 }
