@@ -17,7 +17,7 @@ import { Experience } from "@/sections/Experience";
 import { Hero } from "@/sections/Hero";
 import { Projects } from "@/sections/Projects";
 import { projects } from "@/utils/data-dummy";
-import { DialogPopup } from "./components/DialogPopup";
+import { DialogPopup } from "@/components/DialogPopup";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother);
 
@@ -58,7 +58,7 @@ function App() {
         <Contact />
         <Footer onClickScroll={onClickScroll} />
       </main>
-      <DialogCarousel isOpen={openDialog} onClose={handleCloseDialog} className="max-w-3xl glass" slides={projects} currIdx={2} />
+      <DialogCarousel isOpen={openDialog} onClose={handleCloseDialog} className="max-w-3xl glass" slides={projects} currIdx={2} loop={true} autoplay={true} autoplayDelay={5000} />
       <DialogPopup isOpen={openPopup} onClose={handleCloseClickPopup} title="Project Currently Inactive" type="info" confirmText="Close" onConfirm={handleCloseClickPopup} showCloseButton={false}>
         <p>This project is not active at the moment. Please check back later for updates.</p>
       </DialogPopup>

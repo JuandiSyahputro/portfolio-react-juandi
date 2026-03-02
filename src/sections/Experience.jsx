@@ -12,6 +12,94 @@ export const Experience = (props) => {
   const containerTimeline = useRef();
   const progressBar = useRef();
   const dotBars = useRef([]);
+  const cardExp = useRef([]);
+
+  useGSAP(
+    () => {
+      const cards = cardExp.current;
+      const mm = gsap.matchMedia();
+
+      // Safety check
+      if (!cards.length) return;
+
+      gsap.set(cards, {
+        position: "relative",
+        willChange: "transform",
+      });
+
+      mm.add("(min-width: 768px)", () => {
+        cards.forEach((card, index) => {
+          const nextCard = cards[index + 1];
+
+          gsap.set(card, {
+            zIndex: cards.length - index,
+          });
+
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top 10%",
+            endTrigger: nextCard || containerExp.current,
+            end: nextCard ? "top 10%" : "bottom bottom",
+            pin: true,
+            pinSpacing: false,
+
+            onEnter: () => {
+              gsap.to(card, {
+                scale: 1,
+                filter: "brightness(1)",
+                duration: 0.3,
+              });
+            },
+
+            onLeave: () => {
+              gsap.to(card, {
+                scale: 0.95,
+                filter: "brightness(0.8)",
+                duration: 0.3,
+              });
+            },
+
+            onEnterBack: () => {
+              gsap.to(card, {
+                scale: 1,
+                filter: "brightness(1)",
+                duration: 0.3,
+              });
+            },
+          });
+        });
+
+        return () => {
+          ScrollTrigger.getAll().forEach((st) => st.kill());
+        };
+      });
+
+      mm.add("(max-width: 767px)", () => {
+        cards.forEach((card) => {
+          gsap.set(card, {
+            clearProps: "all",
+          });
+        });
+      });
+
+      // Entrance animation (dipisahkan dari logic pin)
+      cards.forEach((card) => {
+        gsap.from(card, {
+          opacity: 0,
+          y: 80,
+          rotateX: 10,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      });
+    },
+    { scope: containerTimeline }
+  );
 
   useGSAP(
     () => {
@@ -24,7 +112,7 @@ export const Experience = (props) => {
           scrollTrigger: {
             trigger: containerTimeline.current,
             start: "top 80%",
-            end: "bottom 25%",
+            end: "bottom top",
             scrub: true,
           },
         }
@@ -72,7 +160,11 @@ export const Experience = (props) => {
                 </div>
 
                 {/* Content */}
-                <div className={`pl-8 md:pl-0 ${idx % 2 === 0 ? "md:pr-16 md:text-right" : "md:col-start-2 md:pl-16"}`}>
+                <div
+                  className={`pl-8 md:pl-0 ${idx % 2 === 0 ? "md:pr-16 md:text-right" : "md:col-start-2 md:pl-16"}`}
+                  ref={(el) => {
+                    if (el) cardExp.current[idx] = el;
+                  }}>
                   <div className={`glass p-6 rounded-2xl border border-primary/30 hover:border-primary/50 transition-all duration-500`}>
                     <span className="text-sm text-primary font-medium">{exp.period}</span>
                     <h3 className="text-xl font-semibold mt-2">{exp.role}</h3>

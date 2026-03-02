@@ -7,7 +7,6 @@ const AppContextProvider = ({ children }) => {
   const [openPopup, setOpenPopup] = useState(false);
 
   const handleClickPopup = (link) => {
-    console.log(link);
     if (link !== "#") window.open(link, "_blank");
     else setOpenPopup(true);
   };

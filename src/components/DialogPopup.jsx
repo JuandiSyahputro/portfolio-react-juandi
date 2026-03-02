@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { X, AlertCircle, CheckCircle, Info, Trash2 } from "lucide-react";
 import gsap from "gsap";
 
@@ -21,52 +21,7 @@ const DialogPopup = ({ isOpen, onClose, title, children, type = "default", onCon
 
   const { icon: IconComponent, color, bgLight, textColor } = config[type];
 
-  useEffect(() => {
-    if (isOpen) {
-      // Prevent body scroll
-      document.body.style.overflow = "hidden";
-
-      // Entrance animation timeline
-      const tl = gsap.timeline();
-
-      // Overlay fade in
-      tl.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
-
-      // Dialog scale and fade in with elastic effect
-      tl.fromTo(
-        dialogRef.current,
-        {
-          opacity: 0,
-          scale: 0.8,
-          y: 50,
-          rotateX: -15,
-        },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          rotateX: 0,
-          duration: 0.5,
-          ease: "back.out(1.7)",
-        },
-        "-=0.2"
-      );
-
-      // Content stagger animation
-      tl.fromTo(contentRef.current.children, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: "power2.out" }, "-=0.3");
-
-      // Buttons slide up
-      tl.fromTo(buttonsRef.current.children, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: "power2.out" }, "-=0.2");
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     // Exit animation
     const tl = gsap.timeline({
       onComplete: onClose,
@@ -117,7 +72,7 @@ const DialogPopup = ({ isOpen, onClose, title, children, type = "default", onCon
       },
       "-=0.3"
     );
-  };
+  }, [onClose]);
 
   const handleConfirm = () => {
     if (onConfirm) {
@@ -137,6 +92,68 @@ const DialogPopup = ({ isOpen, onClose, title, children, type = "default", onCon
       handleClose();
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent body scroll
+      document.body.style.overflow = "hidden";
+
+      // Entrance animation timeline
+      const tl = gsap.timeline();
+
+      // Overlay fade in
+      tl.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
+
+      // Dialog scale and fade in with elastic effect
+      tl.fromTo(
+        dialogRef.current,
+        {
+          opacity: 0,
+          scale: 0.8,
+          y: 50,
+          rotateX: -15,
+        },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.5,
+          ease: "back.out(1.7)",
+        },
+        "-=0.2"
+      );
+
+      // Content stagger animation
+      tl.fromTo(contentRef.current.children, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: "power2.out" }, "-=0.3");
+
+      // Buttons slide up
+      tl.fromTo(buttonsRef.current.children, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: "power2.out" }, "-=0.2");
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleClose, isOpen]);
 
   if (!isOpen) return null;
 

@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { AlertCircle, ArrowUpRight, CheckCircle, ChevronLeft, ChevronRight, Info, Trash2, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IconGithub } from "./custom-icons/IconGithub";
 import { useDialog } from "@/hooks/UseContextHooks";
 
@@ -8,13 +8,16 @@ import { useDialog } from "@/hooks/UseContextHooks";
 const DialogCarousel = ({
   isOpen,
   onClose,
-  slides = [], // Array of slide objects: [{ title, content, type, confirmText, cancelText, onConfirm }, ...]
-  singleSlide = null, // For backward compatibility - single slide object
+  slides = [],
+  singleSlide = null,
   showCloseButton = true,
   className = "max-w-md",
   showDots = true,
   showArrows = true,
   loop = false,
+  autoplay = false,
+  autoplayDelay = 4000, // ms
+  pauseOnHover = true,
   currIdx = 0,
 }) => {
   const overlayRef = useRef(null);
@@ -22,6 +25,11 @@ const DialogCarousel = ({
   const contentRef = useRef(null);
   const buttonsRef = useRef(null);
   const carouselRef = useRef(null);
+  const autoplayTimer = useRef(null);
+  const isHovered = useRef(false);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragCurrentX = useRef(0);
   const slideRefs = useRef([]);
 
   const [currentIndex, setCurrentIndex] = useState(currIdx);
@@ -31,6 +39,7 @@ const DialogCarousel = ({
 
   const normalizedSlides = singleSlide ? [singleSlide] : slides;
   const currentSlide = normalizedSlides[currentIndex] || {};
+  const DRAG_THRESHOLD = 50;
 
   const config = {
     default: { icon: Info, color: "bg-primary", textColor: "text-primary", bgLight: "bg-primary/10" },
@@ -42,6 +51,145 @@ const DialogCarousel = ({
 
   const getConfig = (type) => config[type] || config.default;
   const currentConfig = getConfig(currentSlide.type);
+
+  const animateSlideChange = useCallback(
+    (direction, newIndex) => {
+      if (isAnimating || !slideRefs.current[currentIndex]) return;
+
+      setIsAnimating(true);
+      const currentSlideEl = slideRefs.current[currentIndex];
+      const nextSlideEl = slideRefs.current[newIndex];
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setCurrentIndex(newIndex);
+          setIsAnimating(false);
+        },
+      });
+
+      // Animate out current slide
+      tl.to(currentSlideEl, {
+        opacity: 0,
+        x: direction === "next" ? -50 : 50,
+        duration: 0.3,
+        ease: "power2.in",
+      });
+
+      // Animate in new slide
+      tl.fromTo(nextSlideEl, { opacity: 0, x: direction === "next" ? 50 : -50 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, "-=0.1");
+    },
+    [currentIndex, isAnimating]
+  );
+
+  const getNextIndex = useCallback(() => {
+    if (currentIndex < normalizedSlides.length - 1) {
+      return currentIndex + 1;
+    }
+    return loop ? 0 : currentIndex;
+  }, [currentIndex, normalizedSlides.length, loop]);
+
+  const stopAutoplay = () => {
+    if (autoplayTimer.current) {
+      clearInterval(autoplayTimer.current);
+      autoplayTimer.current = null;
+    }
+  };
+
+  const startAutoplay = useCallback(() => {
+    if (!autoplay || normalizedSlides.length <= 1) return;
+
+    stopAutoplay();
+
+    autoplayTimer.current = setInterval(() => {
+      if (isAnimating) return;
+      if (pauseOnHover && isHovered.current) return;
+
+      const nextIndex = getNextIndex();
+      if (nextIndex !== currentIndex) {
+        animateSlideChange("next", nextIndex);
+      }
+    }, autoplayDelay);
+  }, [autoplay, autoplayDelay, animateSlideChange, currentIndex, getNextIndex, isAnimating, normalizedSlides.length, pauseOnHover]);
+
+  const handleClose = useCallback(() => {
+    const tl = gsap.timeline({ onComplete: onClose });
+
+    tl.to(buttonsRef.current?.children || [], { opacity: 0, y: 10, duration: 0.2, stagger: 0.05, ease: "power2.in" });
+    tl.to(contentRef.current?.children || [], { opacity: 0, y: -10, duration: 0.2, stagger: 0.05, ease: "power2.in" }, "-=0.3");
+    tl.to(dialogRef.current, { opacity: 0, scale: 0.9, duration: 0.3, ease: "power2.in" }, "-=0.2");
+    tl.to(overlayRef.current, { opacity: 0, duration: 0.2, ease: "power2.in" }, "-=0.3");
+
+    setCurrentIndex(currIdx);
+  }, [currIdx, onClose]);
+
+  const goToNext = useCallback(() => {
+    stopAutoplay();
+
+    const nextIndex = getNextIndex();
+    if (nextIndex !== currentIndex) {
+      animateSlideChange("next", nextIndex);
+    }
+
+    startAutoplay();
+  }, [animateSlideChange, currentIndex, getNextIndex, startAutoplay]);
+
+  const goToPrev = () => {
+    stopAutoplay();
+
+    if (currentIndex > 0) {
+      animateSlideChange("prev", currentIndex - 1);
+    } else if (loop) {
+      animateSlideChange("prev", normalizedSlides.length - 1);
+    }
+
+    startAutoplay();
+  };
+
+  const goToSlide = (index) => {
+    if (index === currentIndex || isAnimating) return;
+
+    stopAutoplay();
+    const direction = index > currentIndex ? "next" : "prev";
+    animateSlideChange(direction, index);
+
+    startAutoplay();
+  };
+
+  const handlePointerDown = (e) => {
+    if (isAnimating) return;
+
+    isDragging.current = true;
+    dragStartX.current = e.clientX;
+    dragCurrentX.current = e.clientX;
+
+    stopAutoplay();
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging.current) return;
+
+    dragCurrentX.current = e.clientX;
+  };
+
+  const handlePointerUp = () => {
+    if (!isDragging.current) return;
+
+    const deltaX = dragCurrentX.current - dragStartX.current;
+    isDragging.current = false;
+
+    if (Math.abs(deltaX) < DRAG_THRESHOLD) {
+      startAutoplay();
+      return;
+    }
+
+    if (deltaX < 0) {
+      // geser ke kiri → NEXT
+      goToNext();
+    } else {
+      // geser ke kanan → PREV
+      goToPrev();
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -70,64 +218,32 @@ const DialogCarousel = ({
     };
   }, [currIdx, isOpen]);
 
-  const handleClose = () => {
-    const tl = gsap.timeline({ onComplete: onClose });
-
-    tl.to(buttonsRef.current?.children || [], { opacity: 0, y: 10, duration: 0.2, stagger: 0.05, ease: "power2.in" });
-    tl.to(contentRef.current?.children || [], { opacity: 0, y: -10, duration: 0.2, stagger: 0.05, ease: "power2.in" }, "-=0.3");
-    tl.to(dialogRef.current, { opacity: 0, scale: 0.9, duration: 0.3, ease: "power2.in" }, "-=0.2");
-    tl.to(overlayRef.current, { opacity: 0, duration: 0.2, ease: "power2.in" }, "-=0.3");
-
-    setCurrentIndex(currIdx);
-  };
-
-  const animateSlideChange = (direction, newIndex) => {
-    if (isAnimating || !slideRefs.current[currentIndex]) return;
-
-    setIsAnimating(true);
-    const currentSlideEl = slideRefs.current[currentIndex];
-    const nextSlideEl = slideRefs.current[newIndex];
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setCurrentIndex(newIndex);
-        setIsAnimating(false);
-      },
-    });
-
-    // Animate out current slide
-    tl.to(currentSlideEl, {
-      opacity: 0,
-      x: direction === "next" ? -50 : 50,
-      duration: 0.3,
-      ease: "power2.in",
-    });
-
-    // Animate in new slide
-    tl.fromTo(nextSlideEl, { opacity: 0, x: direction === "next" ? 50 : -50 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, "-=0.1");
-  };
-
-  const goToNext = () => {
-    if (currentIndex < normalizedSlides.length - 1) {
-      animateSlideChange("next", currentIndex + 1);
-    } else if (loop) {
-      animateSlideChange("next", 0);
+  useEffect(() => {
+    if (isOpen) {
+      startAutoplay();
+    } else {
+      stopAutoplay();
     }
-  };
 
-  const goToPrev = () => {
-    if (currentIndex > 0) {
-      animateSlideChange("prev", currentIndex - 1);
-    } else if (loop) {
-      animateSlideChange("prev", normalizedSlides.length - 1);
-    }
-  };
+    return () => stopAutoplay();
+  }, [isOpen, currentIndex, autoplay, autoplayDelay, startAutoplay]);
 
-  const goToSlide = (index) => {
-    if (index === currentIndex || isAnimating) return;
-    const direction = index > currentIndex ? "next" : "prev";
-    animateSlideChange(direction, index);
-  };
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleClose, isOpen]);
 
   if (!isOpen) return null;
 
@@ -191,7 +307,19 @@ const DialogCarousel = ({
         </div>
 
         {/* Carousel Content */}
-        <div ref={carouselRef} className="relative overflow-hidden min-h-[120px]">
+        <div
+          ref={carouselRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onMouseEnter={() => {
+            isHovered.current = true;
+          }}
+          onMouseLeave={() => {
+            isHovered.current = false;
+          }}
+          className="relative overflow-hidden min-h-[120px]">
           {normalizedSlides.map((slide, index) => {
             const slideConfig = getConfig(slide.type);
             const SlideIcon = slideConfig.icon;
@@ -217,7 +345,7 @@ const DialogCarousel = ({
                         <img src={slide.image} alt={slide.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                         <div className="absolute inset-0 bg-linear-to-t from-card via-card/50 to-transparent opacity-60" />
                         {/* Overlay Links */}
-                        <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute inset-0 flex items-center justify-center gap-4 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                           <button onClick={() => handleClickPopup(slide.link)} className="p-3 rounded-full glass hover:bg-primary text-primary-foreground hover:text-primary-foreground transition-all">
                             <ArrowUpRight className="w-5 h-5" />
                           </button>
