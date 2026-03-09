@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/purity */
 import { Button } from "@/components/Button";
-import { ArrowRight, ChevronDown, Download } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Download, Loader2 } from "lucide-react";
 import { AnimatedBorderButton } from "@/components/AnimatedBorderButton";
 import { IconGithub } from "@/components/custom-icons/IconGithub";
 import { IconInstagram } from "@/components/custom-icons/IconInstagram";
 import { IconLinkedin } from "@/components/custom-icons/IconLinkedin";
+import { Activity, useCallback, useState } from "react";
 
 const skills = [
   "React",
@@ -31,15 +32,55 @@ const skills = [
 ];
 
 export const Hero = ({ onClickScroll, ...props }) => {
-  const handleDownloadResume = () => {
-    const promise = new Promise((resolve) => setTimeout(resolve, 1000));
+  const [downloadState, setDownloadState] = useState("idle"); // idle | loading | success
 
-    promise.then(() => {
-      const link = document.createElement("a");
-      link.href = "/CV-JUANDI.pdf";
-      link.download = "CV-JUANDI.pdf";
-      link.click();
-    });
+  const handleDownloadResume = useCallback(async () => {
+    if (downloadState === "loading") return;
+
+    setDownloadState("loading");
+
+    // Simulate progress with animation
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    // Trigger download
+    const link = document.createElement("a");
+    link.href = "/CV-JUANDI.pdf";
+    link.download = "CV-JUANDI.pdf";
+    link.click();
+
+    setDownloadState("success");
+
+    // Reset after 2 seconds
+    setTimeout(() => setDownloadState("idle"), 2000);
+  }, [downloadState]);
+
+  const getButtonContent = () => {
+    switch (downloadState) {
+      case "loading":
+        return (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="relative">
+              Downloading
+              <span className="absolute -right-4 animate-pulse">...</span>
+            </span>
+          </>
+        );
+      case "success":
+        return (
+          <>
+            <Check className="w-5 h-5 animate-bounce" />
+            <span>Downloaded!</span>
+          </>
+        );
+      default:
+        return (
+          <>
+            <Download className="w-5 h-5 group-hover:animate-bounce" />
+            <span>Download CV</span>
+          </>
+        );
+    }
   };
 
   return (
@@ -99,9 +140,14 @@ export const Hero = ({ onClickScroll, ...props }) => {
               <Button size="lg" onClick={() => onClickScroll("#contact")}>
                 Contact Me <ArrowRight className="w-5 h-5" />
               </Button>
-              <AnimatedBorderButton onClick={handleDownloadResume}>
-                <Download className="w-5 h-5" />
-                Download CV
+              <AnimatedBorderButton
+                onClick={handleDownloadResume}
+                disabled={downloadState === "loading" || downloadState === "success"}
+                className={`
+                  group relative overflow-hidden transition-all duration-500
+                  ${downloadState === "success" ? "text-primary border-primary" : ""}
+                `}>
+                <span className="relative z-10 flex items-center gap-2">{getButtonContent()}</span>
               </AnimatedBorderButton>
             </div>
 
