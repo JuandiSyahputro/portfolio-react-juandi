@@ -3,8 +3,6 @@ import { useRef } from "react";
 
 import { useDialog } from "@/hooks/UseContextHooks";
 import { useGSAP } from "@gsap/react";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -62,8 +60,6 @@ function App() {
       <DialogPopup isOpen={openPopup} onClose={handleCloseClickPopup} title="Project Currently Inactive" type="info" confirmText="Close" onConfirm={handleCloseClickPopup} showCloseButton={false}>
         <p>This project is not active at the moment. Please check back later for updates.</p>
       </DialogPopup>
-      <SpeedInsights />
-      <Analytics />
     </div>
   );
 }
