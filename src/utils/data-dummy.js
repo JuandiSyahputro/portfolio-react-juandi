@@ -1,11 +1,27 @@
 
 export const projects = [
   {
+    title: "Nusa Vitalia",
+    description: "This project is an educational gamification game designed to raise awareness about anemia and the importance of taking blood-boosting tablets (iron supplements). The game uses interactive gameplay and educational content to help players understand anemia prevention, healthy habits, and the importance of regular iron tablet consumption.",
+    image: "/projects/nusa.webp",
+    tags: ["React", "Next.js", "Typescript", "NodeJS", "Tailwind"],
+    link: "https://nusavitalia.com/",
+    github: "#",
+  },
+  {
+    title: "Backoffice System for Nusa Vitalia",
+    description: "A backoffice management system designed to support the administration, monitoring, and management of Nusa Vitalia's platform and operations.",
+    image: "/projects/backoffice-nusa.webp",
+    tags: ["React", "Next.js", "Typescript", "NodeJS", "Tailwind"],
+    link: "https://admin.nusavitalia.com/",
+    github: "#",
+  },
+  {
     title: "Inventory Management System",
     description: "A robust inventory management system with advanced features for tracking and optimizing inventory levels.",
     image: "/projects/inventory.webp",
     tags: ["React", "Next.js", "Typescript", "NodeJS", "Tailwind"],
-    link: "https://inventory-dina-purcashing.vercel.app/",
+    link: "https://inventory-purcashing.vercel.app/",
     github: "https://github.com/JuandiSyahputro/inventory-dina-purcashing",
   },
   {
